@@ -1,5 +1,5 @@
 #! /usr/bin/env stack
--- stack script --resolver lts-9.5
+-- stack script --resolver nightly-2017-10-05
 
 module CriterionLeft where
 
