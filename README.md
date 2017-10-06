@@ -33,3 +33,15 @@ A more detailed explanation can be found here:
 
 The situation before and after resolution is marked with tags `erroneous` & `fixed`. You may
 review the difference with command such as `git diff erroneous fixed`.
+
+Repeatedly Test
+---------------
+
+There surfaced some three more issues during my investigation of this case.
+
+1. Inflated variance (conjectured to be related to 0 deviance). [An issue is opened](https://github.com/bos/criterion/issues/160).
+
+2. `Sample is empty` runtime error. [An issue is
+   opened](https://github.com/bos/criterion/issues/161)
+
+3. `index out of bounds` runtime error. (An issue will be opened.)
