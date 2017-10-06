@@ -42,6 +42,7 @@ There surfaced some three more issues during my investigation of this case.
 1. Inflated variance (conjectured to be related to 0 deviance). [An issue is opened](https://github.com/bos/criterion/issues/160).
 
 2. `Sample is empty` runtime error. [An issue is
-   opened](https://github.com/bos/criterion/issues/161)
+   opened](https://github.com/bos/criterion/issues/161).
 
-3. `index out of bounds` runtime error. (An issue will be opened.)
+3. `index out of bounds` runtime error. [An issue is
+   opened](https://github.com/bos/criterion/issues/162).
