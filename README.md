@@ -21,3 +21,15 @@ The difference between them is solely in the environment type:
     +unrelatedBenchmark n = bench "const" $ nf (const 23 :: Int -> Int) 29
 
 The reason for this error is so far unclear.
+
+---
+
+The reason for such *apparently unreasonable* behaviour is found out to be the strict evaluation
+of the outermost -- that is, tuple, -- constructor. The solution is to add a `~` before the
+pattern.
+
+A more detailed explanation can be found here:
+[github.com/bos/criterion/issues/159](https://github.com/bos/criterion/issues/159).
+
+The situation before and after resolution is marked with tags `erroneous` & `fixed`. You may
+review the difference with command such as `git diff erroneous fixed`.
