@@ -3,8 +3,8 @@
 
 module RepeatedlyTest where
 
-import Control.Monad (when)
-import Data.List (groupBy)
+import Control.Monad (when, replicateM)
+import Data.List (groupBy, sortBy)
 import Data.Maybe
 import System.Environment
 import System.FilePath
@@ -14,8 +14,16 @@ import System.Process
 target = "./CriterionRight.hs"
 targetArgs = []
 
+type Result = (Maybe String, Maybe String)
+
 isOutputPathological output = (length . lines $ output) /= 7
-compareResults (a,x) (b,y) = length a == length b && x == y
+
+eqResults :: Result -> Result -> Bool
+eqResults (a,x) (b,y) = length a == length b && x == y
+
+compareResults :: Result -> Result -> Ordering
+compareResults (a,x) (b,y) | x == y = a `compare` b
+                           | otherwise = x `compare` y
 
 main = do
     args <- getArgs
@@ -25,10 +33,10 @@ main = do
 
 main' (count': _) = do
     let count = (read :: String -> Int) count'
-    captured <- sequence (replicate count captureErrors)
+    captured <- replicateM count captureErrors
     prettyPrint captured
 
-captureErrors :: IO (Maybe (Maybe String, Maybe String))
+captureErrors :: IO (Maybe Result)
 captureErrors = do
     (_, Just stdOut, Just stdErr, pid) <- createProcess $
         (proc target targetArgs) { std_out = CreatePipe, std_err = CreatePipe }
@@ -41,19 +49,19 @@ captureErrors = do
     let maybeError  | (not . null) errors = Just errors
                     | otherwise           = Nothing
 
-    if   isJust maybeOutput || isJust maybeError
-    then return $ Just (maybeOutput, maybeError)
-    else return Nothing
+    if isJust maybeOutput || isJust maybeError
+        then return $ Just (maybeOutput, maybeError)
+        else return Nothing
 
-prettyPrint :: [Maybe (Maybe String, Maybe String)] -> IO ()
+prettyPrint :: [Maybe Result] -> IO ()
 prettyPrint chunks = do
-    let groups = groupBy compareResults . catMaybes $ chunks
+    let groups = groupBy eqResults . sortBy compareResults . catMaybes $ chunks
     let boringN = length . filter isNothing $ chunks
-    when (boringN > 0) $ putStrLn $ (show boringN) ++ " boring chunks ignored."
+    when (boringN > 0) $ putStrLn $ show boringN ++ " boring chunks ignored."
     sequence_ $ prettyPrintGroup <$> groups
 
   where
-    prettyPrintGroup :: [(Maybe String, Maybe String)] -> IO ()
+    prettyPrintGroup :: [Result] -> IO ()
     prettyPrintGroup [] = return ()
     prettyPrintGroup group = do
         putStrLn $ "Group of " ++ show (length group) ++ " entries:"
